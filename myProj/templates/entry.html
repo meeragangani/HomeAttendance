@@ -1,0 +1,183 @@
+
+
+<html>
+<head>
+      <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <style>
+       .container{
+    height: 300px;
+    width: 100%;
+}
+
+#display{
+    width: 100%;
+    font-size: 72px;
+    text-align: center;
+    margin: 0px auto;
+}
+
+.buttons{
+    text-align: center;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    
+<script type="text/javascript">
+
+
+
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+
+
+let displaySeconds = 0;
+let displayMinutes = 0;
+let displayHours = 0;
+
+
+let interval = null;
+
+
+let status = "stopped";
+
+function stopWatch(){
+
+    seconds++;
+
+
+    if(seconds / 60 === 1){
+        seconds = 0;
+        minutes++;
+
+        if(minutes / 60 === 1){
+            minutes = 0;
+            hours++;
+        }
+
+    }
+
+    if(seconds < 10){
+        displaySeconds = "0" + seconds.toString();
+    }
+    else{
+        displaySeconds = seconds;
+    }
+
+    if(minutes < 10){
+        displayMinutes = "0" + minutes.toString();
+    }
+    else{
+        displayMinutes = minutes;
+    }
+
+    if(hours < 10){
+        displayHours = "0" + hours.toString();
+    }
+    else{
+        displayHours = hours;
+    }
+
+
+    document.getElementById("display").innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+
+}
+
+
+function startStop(){
+
+    if(status === "stopped"){
+
+
+        interval = window.setInterval(stopWatch, 1000);
+        document.getElementById("startStop").innerHTML = "Stop"; 
+        status="started"   
+         
+    }
+    else{
+
+        window.clearInterval(interval);
+        document.getElementById("startStop").innerHTML = "Start";
+        status = "stopped";
+        let timer=document.getElementById("display").innerHTML;
+         let title=$("#title").val();
+         let description=$("#description").val();
+        var csrftoken=jQuery("[name=csrfmiddlewaretoken]").val();
+        $.ajax({
+            type:"POST",
+            url:"/homemade/",
+            data:{
+            'timer':timer,
+            'title':title,
+            'description':description,
+            },
+            cache:false,
+            headers:{'X-CSRFToken':csrftoken},
+            success:function(data){
+         alert('your entry has been added')
+            }
+        
+        });
+
+
+    }
+
+}
+
+
+function reset(){
+
+    window.clearInterval(interval);
+    seconds = 0;
+    minutes = 0;
+    hours = 0;
+    document.getElementById("display").innerHTML = "00:00:00";
+    document.getElementById("startStop").innerHTML = "Start";
+
+}
+</script>
+</head>
+<body >
+
+<h1><center>Add Your Work</center></h1>
+
+<!--<form action="" method="POST">-->
+<div>
+    {% csrf_token %}
+
+
+Title:
+    <br/>
+    <input type="text" name="Title" id='title' placeholder="Title">
+    <br><br>
+    Message:
+    <br/>
+    <textarea rows="5" cols="30" name="description" id='description' placeholder="Enter Your Message"></textarea>
+        <br>
+    <br>
+
+
+<!--<input type="submit" value="Post" class='btn' style="background-color:#007BFF;width:100px;"/><br><br>-->
+
+
+<div>
+
+        <div id="display">
+            00:00:00
+        </div>
+
+        <div class="buttons">
+            <button id="startStop" onclick="startStop()">Start</button> <button id="reset" onclick="reset()">Reset</button>
+        </div>
+
+</div>
+</div>
+<!--<input type="submit" value="Post" class='btn' style="background-color:#007BFF;width:100px;"/><br><br>-->
+
+
+</body>
+
+</html>
